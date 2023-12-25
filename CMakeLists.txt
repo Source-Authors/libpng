@@ -102,19 +102,19 @@ message(STATUS "Building for target architecture: ${PNG_TARGET_ARCHITECTURE}")
 # Allow the users to specify a custom location of zlib.
 # With CMake 3.12 and newer, this option is no longer necessary.
 option(PNG_BUILD_ZLIB "[Deprecated; please use ZLIB_ROOT]" OFF)
-if(PNG_BUILD_ZLIB)
-  if("x${ZLIB_ROOT}" STREQUAL "x")
-    message(SEND_ERROR
-            "The option PNG_BUILD_ZLIB=${PNG_BUILD_ZLIB} is no longer supported; "
-            "please use ZLIB_ROOT instead")
-  else()
-    message(SEND_ERROR
-            "The option PNG_BUILD_ZLIB=${PNG_BUILD_ZLIB} is no longer supported; "
-            "using ZLIB_ROOT=\"${ZLIB_ROOT}\"")
-  endif()
-endif()
+#if(PNG_BUILD_ZLIB)
+#  if("x${ZLIB_ROOT}" STREQUAL "x")
+#    message(SEND_ERROR
+#            "The option PNG_BUILD_ZLIB=${PNG_BUILD_ZLIB} is no longer supported; "
+#            "please use ZLIB_ROOT instead")
+#  else()
+#    message(SEND_ERROR
+#            "The option PNG_BUILD_ZLIB=${PNG_BUILD_ZLIB} is no longer supported; "
+#            "using ZLIB_ROOT=\"${ZLIB_ROOT}\"")
+#  endif()
+#endif()
 
-find_package(ZLIB REQUIRED)
+#find_package(ZLIB REQUIRED)
 
 if(UNIX
    AND NOT (APPLE OR BEOS OR HAIKU)
@@ -575,6 +575,7 @@ if(PNG_DEBUG)
 endif()
 
 # Now build our targets.
+include_directories(${CMAKE_CURRENT_SOURCE_DIR} ${ZLIB_INCLUDE_DIRS})
 
 # Initialize the list of libpng library targets.
 set(PNG_LIBRARY_TARGETS "")
@@ -628,7 +629,7 @@ if(PNG_SHARED)
                              PUBLIC $<BUILD_INTERFACE:${CMAKE_CURRENT_BINARY_DIR}>)
   target_include_directories(png_shared SYSTEM
                              INTERFACE $<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}/libpng${PNGLIB_ABI_VERSION}>)
-  target_link_libraries(png_shared PUBLIC ZLIB::ZLIB ${M_LIBRARY})
+  target_link_libraries(png_shared PUBLIC ${ZLIB_LIBRARIES} ${M_LIBRARY})
 endif()
 
 if(PNG_STATIC)
@@ -645,7 +646,7 @@ if(PNG_STATIC)
                              PUBLIC $<BUILD_INTERFACE:${CMAKE_CURRENT_BINARY_DIR}>)
   target_include_directories(png_static SYSTEM
                              INTERFACE $<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}/libpng${PNGLIB_ABI_VERSION}>)
-  target_link_libraries(png_static PUBLIC ZLIB::ZLIB ${M_LIBRARY})
+  target_link_libraries(png_static PUBLIC ${ZLIB_LIBRARIES} ${M_LIBRARY})
 endif()
 
 if(PNG_FRAMEWORK AND NOT APPLE)
@@ -676,7 +677,7 @@ if(PNG_FRAMEWORK)
                              PUBLIC $<BUILD_INTERFACE:${CMAKE_CURRENT_BINARY_DIR}>)
   target_include_directories(png_framework SYSTEM
                              INTERFACE $<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}/libpng${PNGLIB_ABI_VERSION}>)
-  target_link_libraries(png_framework PUBLIC ZLIB::ZLIB ${M_LIBRARY})
+  target_link_libraries(png_framework PUBLIC ${ZLIB_LIBRARIES} ${M_LIBRARY})
 endif()
 
 if(NOT PNG_LIBRARY_TARGETS)
@@ -865,7 +866,7 @@ if(PNG_SHARED AND PNG_TOOLS)
   set(PNG_BIN_TARGETS pngfix)
 
   add_executable(png-fix-itxt ${png_fix_itxt_sources})
-  target_link_libraries(png-fix-itxt PRIVATE ZLIB::ZLIB ${M_LIBRARY})
+  target_link_libraries(png-fix-itxt PRIVATE ${ZLIB_LIBRARIES} ${M_LIBRARY})
   list(APPEND PNG_BIN_TARGETS png-fix-itxt)
 endif()
 
